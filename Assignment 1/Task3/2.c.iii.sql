@@ -1,0 +1,1 @@
+SELECT SUM(SubTotal) AS 'Total', SalesTerritory.NameFROM Sales.SalesOrderHeaderINNER JOIN Sales.Customer ON Customer.CustomerID = SalesOrderHeader.CustomerIDINNER JOIN Sales.SalesTerritoryON SalesTerritory.TerritoryID = Customer.CustomerIDGROUP BY SalesTerritory.Name
