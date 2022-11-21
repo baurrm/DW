@@ -1,0 +1,43 @@
+DataSource under AWsrc Schema
+
+1. Table ProductDIM
+
+SELECT a.ProductID, a.ProductName, a.ProductColor, a.ProductSize, a.ProductLine, a.ProductFinishedGoodsFlag, b.ProductSubcategoryName, c.ProductCategoryName
+INTO ProductDIM
+FROM dbo.Product AS a
+	LEFT JOIN dbo.ProductSubcategory AS b
+	ON b.ProductSubcategoryID = a.ProductSubcategoryID
+	LEFT JOIN dbo.ProductCategory AS c
+	ON c.ProductCategoryID = b.ProductCategoryID
+WHERE a.ProductColor IS NOT NULL AND a.ProductLine IS NOT NULL AND a.ProductSize IS NOT NULL 
+AND b.ProductSubcategoryName IS NOT NULL AND c.ProductCategoryName IS NOT NULL;
+GO
+
+2. Table OrdersFact
+
+SELECT a.*, b.Status, b.TerritoryID
+INTO OrdersFact
+FROM dbo.SalesOrderDetail AS a
+	LEFT JOIN dbo.SalesOrderHeader AS b
+	ON b.SalesOrderID = a.SalesOrderID
+GO
+
+P.S. dbo.SalesOrderDetail contains columns such as SalesID, SalesOrderDetailID, LineTotal, UnitPriceDiscount, UnitPrice, OrderQTY, ProductID
+
+
+3. Table TimeDIM 
+
+SELECT a.SalesOrderID AS 'TimeDIM_ID' , CAST(a.DueDate AS DATE) AS 'Date', a.DueDate AS 'FullDate', Datepart(year, a.DueDate) AS 'Year', 
+Datepart(quarter, a.DueDate) AS 'Quarter', DATENAME(month, CAST(a.DueDate AS DATE)) AS 'Month', Datepart(day, a.DueDate) AS 'Day' 
+INTO TimeDIM
+FROM dbo.SalesOrderHeader AS a;
+GO
+
+4. Table SalesLocationDIM
+
+SELECT *
+INTO SalesLocationDIM
+FROM dbo.SalesTerritory AS a;
+GO
+
+!Just in Case all SQL files will be attached.
