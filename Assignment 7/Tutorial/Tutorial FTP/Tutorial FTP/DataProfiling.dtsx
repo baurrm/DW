@@ -1,0 +1,217 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="12/5/2022 10:35:12 AM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="DESKTOP-0SI22A3"
+  DTS:CreatorName="DESKTOP-0SI22A3\Baur"
+  DTS:DTSID="{77B1C393-3292-4243-BA51-6F3E4BC9E547}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.170"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="Package1"
+  DTS:PackageType="5"
+  DTS:VersionBuild="3"
+  DTS:VersionGUID="{D93795E0-9340-43CA-98CE-A1D3151E6563}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[LastTutorial]"
+      DTS:CreationName="FILE"
+      DTS:DTSID="{A30510A2-87E0-4243-AB4A-4D2F61B4BAE9}"
+      DTS:ObjectName="LastTutorial">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:FileUsageType="1"
+          DTS:ConnectionString="C:\Data Warehouse\Laboratory\Assignment 7\Tutorial\LastTutorial" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[localhost.AdventureWorks2014]"
+      DTS:CreationName="ADO.NET:System.Data.SqlClient.SqlConnection, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      DTS:DTSID="{1E848139-BFAB-46CA-853A-BA3A06915950}"
+      DTS:ObjectName="localhost.AdventureWorks2014">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=localhost;Initial Catalog=AdventureWorks2014;Integrated Security=True;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Data Profiling Task"
+      DTS:CreationName="Microsoft.DataProfilingTask"
+      DTS:Description="Data Profiling Task"
+      DTS:DTSID="{7F84F9D1-37D5-42A4-BA85-43099116ECE2}"
+      DTS:ExecutableType="Microsoft.DataProfilingTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Data Profiling Task"
+      DTS:TaskContact="Data Profiling Task; Microsoft Corporation; SQL Server 2019; (c) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <DataProfilingTaskData
+          Destination="LastTutorial"
+          OverwriteDestination="True">
+          <ProfileInput><![CDATA[<?xml version="1.0" encoding="utf-16"?>
+<DataProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/sqlserver/2008/DataDebugger/">
+  <ProfileVersion>1.0</ProfileVersion>
+  <DataSources />
+  <DataProfileInput>
+    <ProfileMode>Exact</ProfileMode>
+    <Timeout>0</Timeout>
+    <Requests>
+      <CandidateKeyProfileRequest ID="KeyReq">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <KeyColumns>
+          <Column IsWildCard="false" ColumnName="AddressID" />
+          <Column IsWildCard="false" ColumnName="AddressLine1" />
+          <Column IsWildCard="false" ColumnName="City" />
+          <Column IsWildCard="false" ColumnName="PostalCode" />
+        </KeyColumns>
+        <ThresholdSetting>Specified</ThresholdSetting>
+        <KeyStrengthThreshold>0.95</KeyStrengthThreshold>
+        <VerifyOutputInFastMode>false</VerifyOutputInFastMode>
+        <MaxNumberOfViolations>100</MaxNumberOfViolations>
+      </CandidateKeyProfileRequest>
+      <ColumnLengthDistributionProfileRequest ID="LengthDistReq">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="false" ColumnName="AddressLine1" />
+        <IgnoreLeadingSpace>false</IgnoreLeadingSpace>
+        <IgnoreTrailingSpace>true</IgnoreTrailingSpace>
+      </ColumnLengthDistributionProfileRequest>
+      <ColumnLengthDistributionProfileRequest ID="LengthDistReq1">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="false" ColumnName="AddressLine2" />
+        <IgnoreLeadingSpace>false</IgnoreLeadingSpace>
+        <IgnoreTrailingSpace>true</IgnoreTrailingSpace>
+      </ColumnLengthDistributionProfileRequest>
+      <FunctionalDependencyProfileRequest ID="FDReq">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <DeterminantColumns>
+          <Column IsWildCard="false" ColumnName="City" />
+        </DeterminantColumns>
+        <DependentColumn IsWildCard="false" ColumnName="StateProvinceID" />
+        <ThresholdSetting>Specified</ThresholdSetting>
+        <FDStrengthThreshold>0.3</FDStrengthThreshold>
+        <VerifyOutputInFastMode>false</VerifyOutputInFastMode>
+        <MaxNumberOfViolations>100</MaxNumberOfViolations>
+      </FunctionalDependencyProfileRequest>
+      <CandidateKeyProfileRequest ID="KeyReq1">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <KeyColumns>
+          <Column IsWildCard="false" ColumnName="AddressID" />
+          <Column IsWildCard="false" ColumnName="AddressLine1" />
+          <Column IsWildCard="false" ColumnName="AddressLine2" />
+          <Column IsWildCard="false" ColumnName="City" />
+          <Column IsWildCard="false" ColumnName="ModifiedDate" />
+          <Column IsWildCard="false" ColumnName="PostalCode" />
+          <Column IsWildCard="false" ColumnName="rowguid" />
+          <Column IsWildCard="false" ColumnName="StateProvinceID" />
+        </KeyColumns>
+        <ThresholdSetting>Specified</ThresholdSetting>
+        <KeyStrengthThreshold>0.95</KeyStrengthThreshold>
+        <VerifyOutputInFastMode>false</VerifyOutputInFastMode>
+        <MaxNumberOfViolations>100</MaxNumberOfViolations>
+      </CandidateKeyProfileRequest>
+      <ColumnNullRatioProfileRequest ID="NullRatioReq">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="false" ColumnName="AddressLine2" />
+      </ColumnNullRatioProfileRequest>
+      <ColumnPatternProfileRequest ID="PatternReq">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="false" ColumnName="PostalCode" />
+        <MaxNumberOfPatterns>10</MaxNumberOfPatterns>
+        <PercentageDataCoverageDesired>95</PercentageDataCoverageDesired>
+        <CaseSensitive>false</CaseSensitive>
+        <Delimiters> \t\r\n</Delimiters>
+        <Symbols>,.;:-"'`~=&amp;/\\@!?()&lt;&gt;[]{}|#*^%</Symbols>
+        <TagTableName />
+      </ColumnPatternProfileRequest>
+      <ColumnStatisticsProfileRequest ID="StatisticsReq">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="false" ColumnName="StateProvinceID" />
+      </ColumnStatisticsProfileRequest>
+      <ColumnValueDistributionProfileRequest ID="ValueDistReq">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="false" ColumnName="City" />
+        <Option>FrequentValues</Option>
+        <FrequentValueThreshold>0.001</FrequentValueThreshold>
+      </ColumnValueDistributionProfileRequest>
+      <ColumnNullRatioProfileRequest ID="NullRatioReq1">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="true" />
+      </ColumnNullRatioProfileRequest>
+      <ColumnStatisticsProfileRequest ID="StatisticsReq1">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="true" />
+      </ColumnStatisticsProfileRequest>
+      <ColumnLengthDistributionProfileRequest ID="LengthDistReq2">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="true" />
+        <IgnoreLeadingSpace>false</IgnoreLeadingSpace>
+        <IgnoreTrailingSpace>true</IgnoreTrailingSpace>
+      </ColumnLengthDistributionProfileRequest>
+      <ColumnValueDistributionProfileRequest ID="ValueDistReq1">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <Column IsWildCard="true" />
+        <Option>FrequentValues</Option>
+        <FrequentValueThreshold>0.001</FrequentValueThreshold>
+      </ColumnValueDistributionProfileRequest>
+      <CandidateKeyProfileRequest ID="KeyReq2">
+        <DataSourceID>{1E848139-BFAB-46CA-853A-BA3A06915950}</DataSourceID>
+        <Table Schema="Person" Table="Address" />
+        <KeyColumns>
+          <Column IsWildCard="true" />
+        </KeyColumns>
+        <ThresholdSetting>Specified</ThresholdSetting>
+        <KeyStrengthThreshold>0.95</KeyStrengthThreshold>
+        <VerifyOutputInFastMode>false</VerifyOutputInFastMode>
+        <MaxNumberOfViolations>100</MaxNumberOfViolations>
+      </CandidateKeyProfileRequest>
+    </Requests>
+  </DataProfileInput>
+  <DataProfileOutput>
+    <Profiles />
+  </DataProfileOutput>
+</DataProfile>]]></ProfileInput>
+        </DataProfilingTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph">
+        <NodeLayout
+          Size="167.5,42"
+          Id="Package\Data Profiling Task"
+          TopLeft="136.5,62" />
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

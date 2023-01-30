@@ -1,0 +1,1270 @@
+<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="12/14/2021 6:36:02 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="WIN-FGR94RCBK65"
+  DTS:CreatorName="WIN-FGR94RCBK65\user"
+  DTS:DTSID="{B1622145-E0BE-4421-BBD6-2E50203B1864}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.170"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="Task3"
+  DTS:PackageType="5"
+  DTS:VersionBuild="33"
+  DTS:VersionGUID="{897AF73A-3345-4F9E-9E08-640DE496F6D5}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Create and fill StageTime Table"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{815EA8CF-1D4A-4806-BE6F-84A090A464BA}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Create and fill StageTime Table"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{7495B1B6-2FAD-4B3D-909D-BAFB6F5206E0}"
+          SQLTask:SqlStatementSource="DECLARE @BeginDate DATETIME&#xA;DECLARE @EndDate DATETIME&#xA;&#xA;SET @BeginDate = (SELECT MIN(OrderDate) FROM AWsrc.SalesOrderHeader);&#xA;SET @EndDate = (SELECT MAX(DueDate) FROM AWsrc.SalesOrderHeader);&#xA;&#xA;IF @BeginDate &gt;  (SELECT MIN(ShipDate) FROM AWsrc.SalesOrderHeader)&#xA;&#x9;SET @BeginDate =  (SELECT MIN(ShipDate) FROM AWsrc.SalesOrderHeader)&#xA;&#xA;IF @BeginDate &gt;  (SELECT MIN(DueDate) FROM AWsrc.SalesOrderHeader)&#xA;&#x9;SET @BeginDate =  (SELECT MIN(Duedate) FROM AWsrc.SalesOrderHeader)&#x9;&#xA;&#xA;IF @EndDate &lt;  (SELECT MAX(ShipDate) FROM AWsrc.SalesOrderHeader)&#xA;&#x9;SET @EndDate =  (SELECT MAX(ShipDate) FROM AWsrc.SalesOrderHeader)&#xA;&#xA;IF @EndDate &lt;  (SELECT MAX(OrderDate) FROM AWsrc.SalesOrderHeader)&#xA;&#x9;SET @EndDate =  (SELECT MAX(OrderDate) FROM AWsrc.SalesOrderHeader)&#xA;&#xA;DECLARE @TempTimeTable Table(&#xA;&#x9;FullDate DATE&#xA;);&#xA;&#xA;WITH TempTimeTable AS (&#xA;&#x9;SELECT CAST(@BeginDate AS DATETIME) FullDate&#xA;&#x9;UNION ALL &#xA;&#x9;SELECT DATEADD(dd, 1, FullDate)&#xA;&#x9;FROM TempTimeTable&#xA;&#x9;WHERE DATEADD(dd, 1, FullDate) &lt;= CAST(@EndDate AS DATETIME)&#xA;)&#xA;SELECT FullDate&#xA;INTO AWstage.StageTime&#xA;FROM TempTimeTable&#xA;OPTION (MAXRECURSION 2000); " xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Drop DimTimeExtended Table"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{268391A3-2005-4812-800B-016E44AD7691}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Drop DimTimeExtended Table"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{7495B1B6-2FAD-4B3D-909D-BAFB6F5206E0}"
+          SQLTask:SqlStatementSource="GO&#xA;DROP TABLE IF EXISTS AWfinal.DimTimeExtended&#xA;GO" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Drop StageTime Table"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{D2E03D60-2F5E-4BB5-B74D-0BCA106176FA}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Drop StageTime Table"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{7495B1B6-2FAD-4B3D-909D-BAFB6F5206E0}"
+          SQLTask:SqlStatementSource="DROP TABLE IF EXISTS AWstage.StageTime;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Process DimTimeExtended Table"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{ED6891D7-86DA-4A44-A2D0-EDF7F7B2B67C}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Process DimTimeExtended Table"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Process DimTimeExtended Table\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[DimTimeExtended]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Process DimTimeExtended Table\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="{7495B1B6-2FAD-4B3D-909D-BAFB6F5206E0}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[localhost.AWStageDB]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[FullDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="FullDate"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[FullDate]"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Month]"
+                      cachedDataType="i4"
+                      cachedName="Month"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Month]"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Year]"
+                      cachedDataType="i4"
+                      cachedName="Year"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Year]"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Year]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Quarter]"
+                      cachedDataType="i4"
+                      cachedName="Quarter"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quarter]"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Quarter]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DayOfWeek]"
+                      cachedDataType="i4"
+                      cachedName="DayOfWeek"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DayOfWeek]"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[DayOfWeek]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Day]"
+                      cachedDataType="i4"
+                      cachedName="Day"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Day]"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Day]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[MonthName]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="MonthName"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[MonthName]"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[MonthName]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DayOfWeekName]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="DayOfWeekName"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DayOfWeekName]"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[DayOfWeekName]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[QuarterName]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="QuarterName"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[QuarterName]"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[QuarterName]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[SeasonName]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="SeasonName"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SeasonName]"
+                      lineageId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Output].Columns[SeasonName]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[FullDate]"
+                      dataType="dbTimeStamp"
+                      name="FullDate" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Month]"
+                      dataType="i4"
+                      name="Month" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Year]"
+                      dataType="i4"
+                      name="Year" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quarter]"
+                      dataType="i4"
+                      name="Quarter" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DayOfWeek]"
+                      dataType="i4"
+                      name="DayOfWeek" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Day]"
+                      dataType="i4"
+                      name="Day" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[MonthName]"
+                      dataType="wstr"
+                      length="10"
+                      name="MonthName" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DayOfWeekName]"
+                      dataType="wstr"
+                      length="10"
+                      name="DayOfWeekName" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[QuarterName]"
+                      dataType="wstr"
+                      length="2"
+                      name="QuarterName" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SeasonName]"
+                      dataType="wstr"
+                      length="10"
+                      name="SeasonName" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quarter-Year]"
+                      dataType="wstr"
+                      length="9"
+                      name="Quarter-Year" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Month-Quarter-Year]"
+                      dataType="wstr"
+                      length="12"
+                      name="Month-Quarter-Year" />
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Day-Month-Quarter-Year]"
+                      dataType="wstr"
+                      length="15"
+                      name="Day-Month-Quarter-Year" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Process DimTimeExtended Table\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Process DimTimeExtended Table\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[AWstage].[StageTime]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">0</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Process DimTimeExtended Table\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="{7495B1B6-2FAD-4B3D-909D-BAFB6F5206E0}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[localhost.AWStageDB]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[FullDate]"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]"
+                      name="FullDate"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[FullDate]"
+                      dataType="dbTimeStamp"
+                      name="FullDate" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[FullDate]"
+                      dataType="dbTimeStamp"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[FullDate]"
+                      name="FullDate" />
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Process DimTimeExtended Table\Part i"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="Part i"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Process DimTimeExtended Table\Part i.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Inputs[Derived Column Input].Columns[FullDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="FullDate"
+                      lineageId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part i.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]"
+                      name="Month"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[MONTH](#{Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]})</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">MONTH(FullDate)</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Year]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Year]"
+                      name="Year"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[DATEPART]("yyyy",#{Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]})</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">DATEPART("yyyy",FullDate)</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Quarter]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Quarter]"
+                      name="Quarter"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[DATEPART]("qq",#{Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]})</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">DATEPART("qq",FullDate)</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[DayOfWeek]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[DayOfWeek]"
+                      name="DayOfWeek"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[DATEPART]("dw",#{Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]})</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">DATEPART("dw",FullDate)</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Day]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Day]"
+                      name="Day"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[DATEPART]("dd",#{Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output].Columns[FullDate]})</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">DATEPART("dd",FullDate)</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part i.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Process DimTimeExtended Table\Part ii"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="Part ii"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Process DimTimeExtended Table\Part ii.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Inputs[Derived Column Input].Columns[Month]"
+                      cachedDataType="i4"
+                      cachedName="Month"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Inputs[Derived Column Input].Columns[Quarter]"
+                      cachedDataType="i4"
+                      cachedName="Quarter"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Quarter]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Inputs[Derived Column Input].Columns[DayOfWeek]"
+                      cachedDataType="i4"
+                      cachedName="DayOfWeek"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[DayOfWeek]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part ii.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[MonthName]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="10"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[MonthName]"
+                      name="MonthName"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[SUBSTRING]("January   Febuary   March     April     May       June      July      August    September October   November  December  ",((#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]} - 1) * 10) + 1,10)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">SUBSTRING("January   Febuary   March     April     May       June      July      August    September October   November  December  ",((Month - 1) * 10) + 1,10)</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[DayOfWeekName]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="10"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[DayOfWeekName]"
+                      name="DayOfWeekName"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[SUBSTRING]("MONDAY    TUESDAY   WEDNESDAY THURSDAY  FRIDAY    SATURDAY  SUNDAY    ",((#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[DayOfWeek]} - 1) * 10) + 1,10)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">SUBSTRING("MONDAY    TUESDAY   WEDNESDAY THURSDAY  FRIDAY    SATURDAY  SUNDAY    ",((DayOfWeek - 1) * 10) + 1,10)</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[QuarterName]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="2"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[QuarterName]"
+                      name="QuarterName"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[SUBSTRING]("Q1 Q2 Q3 Q4 ",((#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Quarter]} - 1) * 3) + 1,2)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">SUBSTRING("Q1 Q2 Q3 Q4 ",((Quarter - 1) * 3) + 1,2)</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part ii.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Process DimTimeExtended Table\Part iii"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="Part iii"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Process DimTimeExtended Table\Part iii.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iii.Inputs[Derived Column Input].Columns[Quarter]"
+                      cachedDataType="i4"
+                      cachedName="Quarter"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Quarter]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part iii.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Output].Columns[SeasonName]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="10"
+                      lineageId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Output].Columns[SeasonName]"
+                      name="SeasonName"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[SUBSTRING]("Winter    Spring    Summer    Fall      ",((#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Quarter]} - 1) * 10) + 1,10)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">SUBSTRING("Winter    Spring    Summer    Fall      ",((Quarter - 1) * 10) + 1,10)</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part iii.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Process DimTimeExtended Table\Part iv"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="Part iv"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input].Columns[Month]"
+                      cachedDataType="i4"
+                      cachedName="Month"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input].Columns[Year]"
+                      cachedDataType="i4"
+                      cachedName="Year"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Year]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input].Columns[Day]"
+                      cachedDataType="i4"
+                      cachedName="Day"
+                      lineageId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Day]" />
+                    <inputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input].Columns[QuarterName]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="QuarterName"
+                      lineageId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[QuarterName]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output].Columns[Quarter-Year]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="9"
+                      lineageId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output].Columns[Quarter-Year]"
+                      name="Quarter-Year"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_WSTR,2)#{Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[QuarterName]} + " - " + (DT_WSTR,4)#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Year]}</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_WSTR,2)QuarterName + " - " + (DT_WSTR,4)Year</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output].Columns[Month-Quarter-Year]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="12"
+                      lineageId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output].Columns[Month-Quarter-Year]"
+                      name="Month-Quarter-Year"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_WSTR,2)#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]} + "-" + (DT_WSTR,2)#{Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[QuarterName]} + " - " + (DT_WSTR,4)#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Year]}</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_WSTR,2)Month + "-" + (DT_WSTR,2)QuarterName + " - " + (DT_WSTR,4)Year</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output].Columns[Day-Month-Quarter-Year]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="15"
+                      lineageId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output].Columns[Day-Month-Quarter-Year]"
+                      name="Day-Month-Quarter-Year"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_WSTR,2)#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Day]} + "-" + (DT_WSTR,2)#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Month]} + "-" + (DT_WSTR,2)#{Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output].Columns[QuarterName]} + " - " + (DT_WSTR,4)#{Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output].Columns[Year]}</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_WSTR,2)Day + "-" + (DT_WSTR,2)Month + "-" + (DT_WSTR,2)QuarterName + " - " + (DT_WSTR,4)Year</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Process DimTimeExtended Table.Paths[Derived Column Output]"
+              endId="Package\Process DimTimeExtended Table\Part ii.Inputs[Derived Column Input]"
+              name="Derived Column Output"
+              startId="Package\Process DimTimeExtended Table\Part i.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Process DimTimeExtended Table.Paths[Derived Column Output1]"
+              endId="Package\Process DimTimeExtended Table\Part iii.Inputs[Derived Column Input]"
+              name="Derived Column Output"
+              startId="Package\Process DimTimeExtended Table\Part ii.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Process DimTimeExtended Table.Paths[Derived Column Output2]"
+              endId="Package\Process DimTimeExtended Table\Part iv.Inputs[Derived Column Input]"
+              name="Derived Column Output"
+              startId="Package\Process DimTimeExtended Table\Part iii.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Process DimTimeExtended Table.Paths[Derived Column Output3]"
+              endId="Package\Process DimTimeExtended Table\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="Derived Column Output"
+              startId="Package\Process DimTimeExtended Table\Part iv.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Process DimTimeExtended Table.Paths[OLE DB Source Output]"
+              endId="Package\Process DimTimeExtended Table\Part i.Inputs[Derived Column Input]"
+              name="OLE DB Source Output"
+              startId="Package\Process DimTimeExtended Table\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{EDEEEECD-2F9D-46D8-8CCD-C581AA3D2A43}"
+      DTS:From="Package\Drop StageTime Table"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\Create and fill StageTime Table" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
+      DTS:CreationName=""
+      DTS:DTSID="{97B5B074-2360-41D6-8DFA-945D6DF1E888}"
+      DTS:From="Package\Create and fill StageTime Table"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 1"
+      DTS:To="Package\Drop DimTimeExtended Table" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 2]"
+      DTS:CreationName=""
+      DTS:DTSID="{A6C6019F-182F-4407-84D2-7B7F3494EC12}"
+      DTS:From="Package\Drop DimTimeExtended Table"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 2"
+      DTS:To="Package\Process DimTimeExtended Table" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="233,42"
+          Id="Package\Create and fill StageTime Table"
+          TopLeft="345.5,81" />
+        <NodeLayout
+          Size="227,42"
+          Id="Package\Drop DimTimeExtended Table"
+          TopLeft="350.5,156.5" />
+        <NodeLayout
+          Size="190,42"
+          Id="Package\Drop StageTime Table"
+          TopLeft="366.5,6" />
+        <NodeLayout
+          Size="243,42"
+          Id="Package\Process DimTimeExtended Table"
+          TopLeft="342,233" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="461.75,48">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,33"
+              Start="0,0"
+              End="0,25.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,25.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="463,123">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,33.5"
+              Start="0,0"
+              End="0,26">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,26" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 2]"
+          TopLeft="463.75,198.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,34.5"
+              Start="0,0"
+              End="0,27">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,27" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\Process DimTimeExtended Table">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="110,42"
+          Id="Package\Process DimTimeExtended Table\Part iii"
+          TopLeft="445,215.5" />
+        <NodeLayout
+          Size="107,42"
+          Id="Package\Process DimTimeExtended Table\Part ii"
+          TopLeft="443.5,145.5" />
+        <NodeLayout
+          Size="105,42"
+          Id="Package\Process DimTimeExtended Table\Part i"
+          TopLeft="444.5,73" />
+        <NodeLayout
+          Size="157,42"
+          Id="Package\Process DimTimeExtended Table\OLE DB Source"
+          TopLeft="419.5,3" />
+        <NodeLayout
+          Size="110,42"
+          Id="Package\Process DimTimeExtended Table\Part iv"
+          TopLeft="444.5,283.5" />
+        <NodeLayout
+          Size="177,42"
+          Id="Package\Process DimTimeExtended Table\OLE DB Destination"
+          TopLeft="415.5,352.5" />
+        <EdgeLayout
+          Id="Package\Process DimTimeExtended Table.Paths[OLE DB Source Output]"
+          TopLeft="497.5,45">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,28"
+              Start="0,0"
+              End="0,20.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,20.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Process DimTimeExtended Table.Paths[Derived Column Output3]"
+          TopLeft="501.75,325.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,27"
+              Start="0,0"
+              End="0,19.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,19.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Process DimTimeExtended Table.Paths[Derived Column Output2]"
+          TopLeft="499.75,257.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,26"
+              Start="0,0"
+              End="0,18.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,18.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Process DimTimeExtended Table.Paths[Derived Column Output1]"
+          TopLeft="498.5,187.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,28"
+              Start="0,0"
+              End="0,20.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,20.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Process DimTimeExtended Table.Paths[Derived Column Output]"
+          TopLeft="497,115">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,30.5"
+              Start="0,0"
+              End="0,23">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,23" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Process DimTimeExtended Table\OLE DB Source">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Process DimTimeExtended Table\OLE DB Destination">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
